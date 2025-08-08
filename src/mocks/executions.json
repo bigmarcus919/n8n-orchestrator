@@ -1,0 +1,18 @@
+[
+  {
+    "id": "e1",
+    "workflowId": "w1",
+    "status": "success",
+    "startedAt": "2025-08-08T06:00:00Z",
+    "durationMs": 4200,
+    "trigger": "schedule"
+  },
+  {
+    "id": "e2",
+    "workflowId": "w1",
+    "status": "error",
+    "startedAt": "2025-08-08T07:00:00Z",
+    "durationMs": 2100,
+    "trigger": "manual"
+  }
+]
