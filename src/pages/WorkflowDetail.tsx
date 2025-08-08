@@ -1,32 +1,59 @@
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Node, Edge } from 'reactflow';
+import Canvas from '@/components/Workflows/Canvas';
+import NodeInspector from '@/components/Workflows/NodeInspector';
+import ReleaseDrawer from '@/components/Workflows/ReleaseDrawer';
 
-import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { n8nClient } from '@/adapters/n8n.client'
-import { useUiStore } from '@/store/ui'
+const WorkflowDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedEnv, setSelectedEnv] = useState('dev');
 
-export default function WorkflowDetail(){
-  const { id } = useParams()
-  const { env } = useUiStore()
-  const [wf, setWf] = useState<any>()
+  // Placeholder 示例数据，后续可以从 n8nClient 加载实际节点和连线
+  const nodes: Node[] = [
+    { id: '1', type: 'default', data: { label: '开始' }, position: { x: 0, y: 50 } },
+    { id: '2', type: 'default', data: { label: '处理' }, position: { x: 200, y: 50 } },
+    { id: '3', type: 'default', data: { label: '结束' }, position: { x: 400, y: 50 } },
+  ];
 
-  useEffect(()=>{ (async()=> setWf(await n8nClient.getWorkflow(env, id!)))() }, [env, id])
+  const edges: Edge[] = [
+    { id: 'e1-2', source: '1', target: '2' },
+    { id: 'e2-3', source: '2', target: '3' },
+  ];
 
-  if(!wf) return <div>加载中…</div>;
   return (
-    <div className="grid grid-cols-12 gap-3">
-      <div className="col-span-9 h-[70vh] border rounded flex items-center justify-center text-gray-400">
-        Canvas Placeholder
+    <div className="flex h-full">
+      <div className="flex-1">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">工作流详情</h2>
+          <div className="space-x-2">
+            <button
+              className="px-3 py-2 text-sm bg-blue-600 text-white rounded"
+              onClick={() => setDrawerOpen(true)}
+            >
+              发布工作流
+            </button>
+          </div>
+        </div>
+        <Canvas nodes={nodes} edges={edges} onNodeSelect={setSelectedNode} />
       </div>
-      <div className="col-span-3 h-[70vh] border rounded p-3 space-y-2">
-        <div className="font-semibold">节点属性</div>
-        <div className="text-sm text-gray-500">选择节点以编辑属性…</div>
-        <button className="w-full py-2 rounded bg-blue-600 text-white">提交发布</button>
-        <button className="w-full py-2 rounded border">激活/禁用</button>
-      </div>
-      <div className="col-span-12 border rounded p-3">
-        <div className="font-semibold mb-2">调试日志</div>
-        <div className="text-sm text-gray-500">运行后显示最近一次执行输入/输出</div>
-      </div>
+      <NodeInspector node={selectedNode} />
+      <ReleaseDrawer
+        isOpen={drawerOpen}
+        environments={['dev', 'test', 'prod']}
+        selectedEnv={selectedEnv}
+        onEnvironmentChange={setSelectedEnv}
+        onClose={() => setDrawerOpen(false)}
+        onConfirm={() => {
+          // TODO: 接入真正的发布逻辑
+          console.log(`发布到 ${selectedEnv} 环境`);
+          setDrawerOpen(false);
+        }}
+      />
     </div>
-  )
-}
+  );
+};
+
+export default WorkflowDetail;
