@@ -1,43 +1,64 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getN8nClient } from '@/adapters/n8n.client';
+import { WorkflowSummary } from '@/adapters/n8n.types';
 
-import { useEffect, useState } from 'react'
-import { n8nClient } from '@/adapters/n8n.client'
-import { useUiStore } from '@/store/ui'
-import { Link } from 'react-router-dom'
+/**
+ * Workflows page fetches and lists available workflows. It links to the
+ * workflow detail page for editing and monitoring a single workflow.
+ */
+const Workflows: React.FC = () => {
+  const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-export default function Workflows(){
-  const { env } = useUiStore()
-  const [rows, setRows] = useState<any[]>([])
-  const [q, setQ] = useState('')
+  useEffect(() => {
+    const client = getN8nClient();
+    setLoading(true);
+    client
+      .listWorkflows()
+      .then((data) => {
+        setWorkflows(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
+  }, []);
 
-  useEffect(()=>{ (async()=>{
-    const data = await n8nClient.listWorkflows(env, q?{q}:{}) ; setRows(data)
-  })() },[env,q])
+  if (loading) return <div>Loading workflows…</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">工作流</h1>
-        <div className="flex gap-2">
-          <input className="px-2 py-1 rounded border" placeholder="搜索…" value={q} onChange={e=>setQ(e.target.value)} />
-          <button className="px-3 py-1 rounded bg-blue-600 text-white">新建</button>
-        </div>
-      </div>
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left border-b"><th className="py-2">名称</th><th>版本</th><th>状态</th><th>成功率</th><th>最近更新</th></tr>
-        </thead>
-        <tbody>
-          {rows.map((r:any)=> (
-            <tr key={r.id} className="border-b hover:bg-gray-50">
-              <td className="py-2"><Link className="text-blue-600" to={`/workflows/${r.id}`}>{r.name}</Link></td>
-              <td>{r.version ?? '—'}</td>
-              <td>{r.active? '启用':'禁用'}</td>
-              <td>—</td>
-              <td>{r.updatedAt ? new Date(r.updatedAt).toLocaleString() : '—'}</td>
+    <div>
+      <h1>Workflows</h1>
+      {workflows.length === 0 ? (
+        <p>No workflows found.</p>
+      ) : (
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: 'left', borderBottom: '1px solid #e5e7eb', padding: '8px' }}>Name</th>
+              <th style={{ textAlign: 'left', borderBottom: '1px solid #e5e7eb', padding: '8px' }}>Active</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {workflows.map((wf) => (
+              <tr key={wf.id}>
+                <td style={{ padding: '8px', borderBottom: '1px solid #f3f4f6' }}>
+                  <Link to={`/workflows/${wf.id}`}>{wf.name}</Link>
+                </td>
+                <td style={{ padding: '8px', borderBottom: '1px solid #f3f4f6' }}>
+                  {wf.active ? 'Yes' : 'No'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
-  )
-}
+  );
+};
+
+export default Workflows;

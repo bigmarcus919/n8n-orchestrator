@@ -1,23 +1,51 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 
-import { NavLink } from 'react-router-dom'
-
-const items = [
-  { to:'/dashboard', label:'Dashboard' },
-  { to:'/workflows', label:'工作流' },
-  { to:'/executions', label:'执行监控' },
-  { to:'/versions', label:'版本管理' },
-  { to:'/credentials', label:'凭据&变量' },
-  { to:'/settings', label:'设置' },
-]
-
-export default function SideNav(){
-  return (
-    <aside className="w-56 border-r border-gray-200 dark:border-gray-800 p-3 space-y-1">
-      {items.map(i=> (
-        <NavLink key={i.to} to={i.to} className={({isActive})=>`block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 ${isActive?'bg-gray-200 dark:bg-gray-700':''}`}>
-          {i.label}
-        </NavLink>
-      ))}
-    </aside>
-  )
+interface NavItem {
+  to: string;
+  label: string;
 }
+
+const navItems: NavItem[] = [
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/workflows', label: 'Workflows' },
+  { to: '/executions', label: 'Executions' },
+  { to: '/monitoring', label: 'Monitoring' },
+  { to: '/versions', label: 'Versions' },
+  { to: '/credentials', label: 'Credentials' },
+  { to: '/settings', label: 'Settings' },
+];
+
+/**
+ * SideNav renders a vertical list of navigation links. Active routes are
+ * highlighted via the `.active` class defined in global CSS.
+ */
+const SideNav: React.FC = () => {
+  return (
+    <nav
+      style={{
+        width: '200px',
+        borderRight: '1px solid #e5e7eb',
+        padding: '16px',
+        background: '#ffffff',
+        overflowY: 'auto',
+      }}
+    >
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        {navItems.map((item) => (
+          <li key={item.to} style={{ marginBottom: '8px' }}>
+            <NavLink
+              to={item.to}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+              className={({ isActive }) => (isActive ? 'active' : '')}
+            >
+              {item.label}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+};
+
+export default SideNav;

@@ -1,33 +1,26 @@
+export interface WorkflowSummary {
+  id: string;
+  name: string;
+  active: boolean;
+  versionId?: string;
+}
 
-export type Workflow = {
-  id: string; name: string; active: boolean; tags: string[];
-  version: string; updatedAt: string; createdAt: string;
-};
+export interface Workflow extends WorkflowSummary {
+  data: any;
+}
 
-export type WorkflowDetail = Workflow & {
-  json: any;
-  nodes?: number; connections?: number;
-};
+export type ExecutionStatus = 'success' | 'error' | 'running';
 
-export type Execution = {
-  id: string; workflowId: string; status: 'success'|'error'|'running';
-  startedAt: string; durationMs: number; trigger: 'manual'|'webhook'|'schedule';
-};
+export interface Execution {
+  id: string;
+  workflowId: string;
+  status: ExecutionStatus;
+  startedAt: string;
+  finishedAt?: string;
+}
 
-export type VersionInfo = {
-  id: string; workflowId: string; version: string; author: string; createdAt: string;
-  summary: string; diff?: any;
-};
-
-export interface IN8nClient {
-  listWorkflows(env: string, query?: { tag?: string; q?: string }): Promise<Workflow[]>;
-  getWorkflow(env: string, id: string): Promise<WorkflowDetail>;
-  saveWorkflow(env: string, payload: { id?: string; json: any; name: string; tags?: string[] }): Promise<WorkflowDetail>;
-  activateWorkflow(env: string, id: string, active: boolean): Promise<void>;
-
-  listExecutions(env: string, query?: { workflowId?: string; status?: string; limit?: number; offset?: number }): Promise<Execution[]>;
-  getExecution(env: string, id: string): Promise<any>;
-
-  listVersions(workflowId: string): Promise<VersionInfo[]>;
-  getVersion(versionId: string): Promise<VersionInfo>;
+export interface N8NClient {
+  listWorkflows(): Promise<WorkflowSummary[]>;
+  getWorkflow(id: string): Promise<Workflow>;
+  listExecutions(workflowId?: string): Promise<Execution[]>;
 }

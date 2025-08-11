@@ -1,9 +1,16 @@
+import React from 'react';
 
-export default function Settings(){
+/**
+ * Settings page provides application-level configurations and preferences such
+ * as theme, authentication details, and integration settings.
+ */
+const Settings: React.FC = () => {
   return (
-    <div className="space-y-3">
-      <h1 className="text-xl font-semibold">设置</h1>
-      <div className="text-sm text-gray-600">平台设置（占位）。</div>
+    <div>
+      <h1>Settings</h1>
+      <p>Application settings and user preferences will appear here.</p>
     </div>
-  )
-}
+  );
+};
+
+export default Settings;

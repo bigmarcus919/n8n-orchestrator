@@ -1,48 +1,68 @@
+import { appConfig } from '@/config/app.config';
+import { useUiStore } from '@/stores/ui';
+import { N8NClient, WorkflowSummary, Workflow, Execution } from './n8n.types';
 
-import { AppConfig } from '@/config/app.config'
-import type { IN8nClient } from './n8n.types'
+/**
+ * HTTP implementation of the N8NClient interface.
+ * Uses fetch to communicate with the n8n REST API. Automatically includes
+ * authorization tokens and switches base URLs based on the selected environment.
+ */
+export const createHttpClient = (): N8NClient => {
+  /**
+   * Construct headers for API requests. Pulls the current environment and token
+   * from the UI store and global config.
+   */
+  const getHeaders = () => {
+    const env = useUiStore.getState().environment;
+    const envConfig = appConfig.environments[env];
+    return {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${envConfig.token}`,
+    };
+  };
 
-function headers(env: keyof typeof AppConfig.environments){
-  const t = AppConfig.environments[env];
-  return { 'Authorization': `Bearer ${t.token}`, 'Content-Type': 'application/json' };
-}
+  /**
+   * Resolve the base URL for the current environment.
+   */
+  const getBaseURL = () => {
+    const env = useUiStore.getState().environment;
+    return appConfig.environments[env].baseURL;
+  };
 
-function base(env: keyof typeof AppConfig.environments){
-  return AppConfig.environments[env].baseURL;
-}
+  /**
+   * Normalize API responses. Some n8n endpoints wrap the payload in a `data`
+   * property. This helper returns the payload regardless of format.
+   */
+  const handleResponse = async <T>(res: Response): Promise<T> => {
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`${res.status} ${res.statusText}: ${text}`);
+    }
+    const json = await res.json();
+    return (json.data ?? json) as T;
+  };
 
-export function createHttpClient(): IN8nClient {
   return {
-    async listWorkflows(env){
-      const res = await fetch(`${base(env)}/rest/workflows`, { headers: headers(env) });
-      const data = await res.json(); return (data.data ?? data);
+    async listWorkflows(): Promise<WorkflowSummary[]> {
+      const res = await fetch(`${getBaseURL()}/rest/workflows`, {
+        headers: getHeaders(),
+      });
+      return handleResponse<WorkflowSummary[]>(res);
     },
-    async getWorkflow(env, id){
-      const res = await fetch(`${base(env)}/rest/workflows/${id}`, { headers: headers(env) });
-      return await res.json();
+    async getWorkflow(id: string): Promise<Workflow> {
+      const res = await fetch(`${getBaseURL()}/rest/workflows/${id}`, {
+        headers: getHeaders(),
+      });
+      return handleResponse<Workflow>(res);
     },
-    async saveWorkflow(env, payload){
-      const url = payload.id ? `${base(env)}/rest/workflows/${payload.id}` : `${base(env)}/rest/workflows`;
-      const method = payload.id ? 'PATCH' : 'POST';
-      const res = await fetch(url, { method, headers: headers(env), body: JSON.stringify(payload.json ? payload : { name: payload.name }) });
-      return await res.json();
+    async listExecutions(workflowId?: string): Promise<Execution[]> {
+      const url = workflowId
+        ? `${getBaseURL()}/rest/executions?workflowId=${workflowId}`
+        : `${getBaseURL()}/rest/executions`;
+      const res = await fetch(url, {
+        headers: getHeaders(),
+      });
+      return handleResponse<Execution[]>(res);
     },
-    async activateWorkflow(env, id, active){
-      const action = active ? 'activate' : 'deactivate';
-      await fetch(`${base(env)}/rest/workflows/${id}/${action}`, { method: 'POST', headers: headers(env) });
-    },
-    async listExecutions(env, q){
-      const sp = new URLSearchParams();
-      if(q?.workflowId) sp.set('workflowId', q.workflowId);
-      if(q?.status) sp.set('status', q.status as any);
-      const res = await fetch(`${base(env)}/rest/executions?${sp.toString()}`, { headers: headers(env) });
-      const data = await res.json(); return (data.data ?? data);
-    },
-    async getExecution(env, id){
-      const res = await fetch(`${base(env)}/rest/executions/${id}`, { headers: headers(env) });
-      return await res.json();
-    },
-    async listVersions(){ return []; },
-    async getVersion(){ return { id:'', workflowId:'', version:'', author:'', createdAt:'', summary:'' }; },
-  }
-}
+  };
+};

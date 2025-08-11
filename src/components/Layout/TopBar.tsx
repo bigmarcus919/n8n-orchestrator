@@ -1,19 +1,50 @@
+import React from 'react';
+import { useUiStore } from '@/stores/ui';
+import { appConfig } from '@/config/app.config';
 
-import { useUiStore } from '@/store/ui'
+/**
+ * TopBar provides a header with the application title, environment selector,
+ * and theme toggle. It reads and updates state via the UI store.
+ */
+const TopBar: React.FC = () => {
+  const environment = useUiStore((state) => state.environment);
+  const setEnvironment = useUiStore((state) => state.setEnvironment);
+  const theme = useUiStore((state) => state.theme);
+  const toggleTheme = useUiStore((state) => state.toggleTheme);
 
-export default function TopBar(){
-  const { env, setEnv } = useUiStore()
   return (
-    <header className="h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800">
-      <div className="font-semibold">n8n Orchestrator</div>
-      <div className="flex items-center gap-3">
-        <select className="px-2 py-1 rounded border" value={env} onChange={e=>setEnv(e.target.value as any)}>
-          <option value="dev">Dev</option>
-          <option value="test">Test</option>
-          <option value="prod">Prod</option>
+    <header
+      style={{
+        height: '48px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 16px',
+        borderBottom: '1px solid #e5e7eb',
+        background: '#ffffff',
+      }}
+    >
+      <div>
+        <strong>n8n Orchestrator</strong>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <select
+          value={environment}
+          onChange={(e) => setEnvironment(e.target.value)}
+          style={{ padding: '4px 8px' }}
+        >
+          {Object.keys(appConfig.environments).map((key) => (
+            <option key={key} value={key}>
+              {appConfig.environments[key].name}
+            </option>
+          ))}
         </select>
-        <input className="px-2 py-1 rounded border w-64" placeholder="搜索工作流/标签/执行…" />
+        <button onClick={toggleTheme} style={{ padding: '4px 8px' }}>
+          {theme === 'light' ? '🌞' : '🌙'}
+        </button>
       </div>
     </header>
-  )
-}
+  );
+};
+
+export default TopBar;

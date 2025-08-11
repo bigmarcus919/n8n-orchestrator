@@ -1,18 +1,40 @@
+export type EnvironmentConfig = {
+  name: string;
+  baseURL: string;
+  token: string;
+};
 
-export type EnvKey = 'dev' | 'test' | 'prod';
+export type AppMode = 'mock' | 'live';
 
-export const AppConfig = {
-  appName: 'n8n Orchestrator',
-  mode: 'mock' as 'mock' | 'live',
+export interface AppConfig {
+  mode: AppMode;
+  environments: Record<string, EnvironmentConfig>;
+  defaultEnv: string;
+}
+
+/**
+ * Global application configuration. Adjust baseURL and token values to point to your
+ * n8n instances for each environment. The `mode` property controls whether the
+ * application uses mocked data ("mock") or performs real HTTP requests ("live").
+ */
+export const appConfig: AppConfig = {
+  mode: 'mock',
+  defaultEnv: 'dev',
   environments: {
-    dev:  { label: 'Dev',  baseURL: 'http://localhost:5678', token: 'REPLACE_DEV_TOKEN' },
-    test: { label: 'Test', baseURL: 'http://localhost:5678', token: 'REPLACE_TEST_TOKEN' },
-    prod: { label: 'Prod', baseURL: 'http://localhost:5678', token: 'REPLACE_PROD_TOKEN' },
+    dev: {
+      name: 'Development',
+      baseURL: 'http://localhost:5678',
+      token: '',
+    },
+    test: {
+      name: 'Test',
+      baseURL: 'http://localhost:5678',
+      token: '',
+    },
+    prod: {
+      name: 'Production',
+      baseURL: 'http://localhost:5678',
+      token: '',
+    },
   },
-  defaultEnv: 'dev' as EnvKey,
-  ui: {
-    theme: 'system' as 'light'|'dark'|'system',
-    primary: '#1F4B99',
-    accent: '#3FA9F5',
-  }
 };

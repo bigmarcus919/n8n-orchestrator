@@ -1,18 +1,25 @@
+import React from 'react';
+import TopBar from './TopBar';
+import SideNav from './SideNav';
 
-import { Outlet } from 'react-router-dom'
-import TopBar from './TopBar'
-import SideNav from './SideNav'
+interface AppShellProps {
+  children: React.ReactNode;
+}
 
-export default function AppShell(){
+/**
+ * AppShell composes the main layout with a side navigation, top bar, and
+ * scrolling content area. The children represent the routed page content.
+ */
+const AppShell: React.FC<AppShellProps> = ({ children }) => {
   return (
-    <div className="h-screen w-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="app-shell" style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <SideNav />
-      <div className="flex-1 flex flex-col">
+      <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <TopBar />
-        <main className="p-4 overflow-auto">
-          <Outlet />
-        </main>
+        <div style={{ flexGrow: 1, overflowY: 'auto', padding: '16px' }}>{children}</div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default AppShell;

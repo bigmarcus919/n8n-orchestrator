@@ -1,18 +1,22 @@
 [
   {
     "id": "e1",
-    "workflowId": "w1",
+    "workflowId": "1",
     "status": "success",
-    "startedAt": "2025-08-08T06:00:00Z",
-    "durationMs": 4200,
-    "trigger": "schedule"
+    "startedAt": "2025-08-01T12:00:00Z",
+    "finishedAt": "2025-08-01T12:00:05Z"
   },
   {
     "id": "e2",
-    "workflowId": "w1",
+    "workflowId": "1",
     "status": "error",
-    "startedAt": "2025-08-08T07:00:00Z",
-    "durationMs": 2100,
-    "trigger": "manual"
+    "startedAt": "2025-08-02T12:00:00Z",
+    "finishedAt": "2025-08-02T12:00:02Z"
+  },
+  {
+    "id": "e3",
+    "workflowId": "2",
+    "status": "running",
+    "startedAt": "2025-08-03T12:00:00Z"
   }
 ]

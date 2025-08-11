@@ -1,25 +1,12 @@
 [
   {
-    "id": "w1",
-    "name": "脏数据治理",
-    "active": true,
-    "tags": [
-      "data",
-      "quality"
-    ],
-    "version": "v3",
-    "updatedAt": "2025-08-01T10:00:00Z",
-    "createdAt": "2025-07-20T01:00:00Z"
+    "id": "1",
+    "name": "Sample Workflow A",
+    "active": true
   },
   {
-    "id": "w2",
-    "name": "向量入库",
-    "active": false,
-    "tags": [
-      "embedding"
-    ],
-    "version": "v1",
-    "updatedAt": "2025-08-03T12:20:00Z",
-    "createdAt": "2025-08-01T09:00:00Z"
+    "id": "2",
+    "name": "Sample Workflow B",
+    "active": false
   }
 ]

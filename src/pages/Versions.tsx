@@ -1,9 +1,17 @@
+import React from 'react';
 
-export default function Versions(){
+/**
+ * Versions page will manage workflow version history, display diffs, and
+ * support rolling back to previous versions. This is a placeholder until
+ * version APIs are implemented.
+ */
+const Versions: React.FC = () => {
   return (
-    <div className="space-y-3">
-      <h1 className="text-xl font-semibold">版本管理</h1>
-      <div className="text-sm text-gray-600">时间轴与版本 Diff（占位）。</div>
+    <div>
+      <h1>Versions</h1>
+      <p>Version management will appear here.</p>
     </div>
-  )
-}
+  );
+};
+
+export default Versions;

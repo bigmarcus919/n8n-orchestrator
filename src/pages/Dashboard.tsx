@@ -1,9 +1,19 @@
+import React from 'react';
 
-export default function Dashboard(){
+/**
+ * Dashboard serves as the default landing page. Here you can surface high-level
+ * metrics, quick actions, or guidance on how to use the platform.
+ */
+const Dashboard: React.FC = () => {
   return (
-    <div className="space-y-3">
-      <h1 className="text-xl font-semibold">Dashboard</h1>
-      <div className="text-sm text-gray-600">这里展示执行趋势、SLA、发布统计（占位）。</div>
+    <div>
+      <h1>Dashboard</h1>
+      <p>
+        Welcome to n8n Orchestrator. Use the navigation on the left to manage
+        your workflows, monitor executions, and configure settings.
+      </p>
     </div>
-  )
-}
+  );
+};
+
+export default Dashboard;
